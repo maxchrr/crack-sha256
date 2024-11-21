@@ -1,0 +1,29 @@
+                               _______
+                             |.-----.|
+                             ||x . x||
+                             ||_.-._||
+                             `--)-(--`
+                            __[=== o]___
+                           |:::::::::::|\
+                           `-=========-`()
+
+Hack SHA-256 is a university project involving an attempt to extract
+credentials (username and password) from leaked data sources (fake data).
+
+Some passwords are in clear text and others in hash form, but based on the
+theory that users use the same passwords on different services, we can try
+to recover some of them.
+
+
+   Legal
+
+THIS PROJECT IS STRICTLY FOR EDUCATIONAL AND RESEARCH PURPOSES. ANY USE OF
+THIS SOFTWARE TO ACCESS OR EXPLOIT PERSONAL DATA IS STRICTLY PROHIBITED AND
+MAY RESULT IN LEGAL ACTION.
+AUTHORS DECLINES ALL RESPONSIBILITY FOR ANY USE OF THIS CODE IN VIOLATION OF
+CURRENT LEGISLATION.
+USE OF THIS SOFTWARE IMPLIES FULL ACCEPTANCE OF THE ABOVE CONDITIONS AND
+COPYRIGHT NOTICE.
+
+           Copyright (c) 2024 Max Charrier, Inès Schneider.
+                         All Rights Reserved.
