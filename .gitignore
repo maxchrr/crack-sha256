@@ -4,3 +4,6 @@
 ### Text files ###
 *.txt
 *.pdf
+
+### Exploit files ###
+exploit_*.ml
