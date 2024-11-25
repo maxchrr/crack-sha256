@@ -38,6 +38,11 @@ let concatenate_files f =
 	aux [] f 0
 
 let sanitize_data l =
+	let rec mem x acc =
+		match acc with
+		| [] -> false
+		| hd::tl -> hd = x || mem x tl
+	in
 	let rec aux acc c =
 		match acc with
 		| [] ->
@@ -45,7 +50,7 @@ let sanitize_data l =
 			acc
 		| hd::tl ->
 			(* return if head element is already present in the tail list *)
-			if List.mem hd tl then begin
+			if mem hd tl then begin
 				(*printf "remove %s entry\n" (fst hd);*)
 				aux tl (c+1)
 			end else
