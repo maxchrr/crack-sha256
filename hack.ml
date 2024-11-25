@@ -1,8 +1,8 @@
 (* Copyright (c) 2024 Max Charrier, Inès Schneider. All Rights Reserved. *)
 
-#use "tools.ml";;
+#use "tools.ml"
 
-open Printf;;
+open Printf
 
 let parse_files n r =
 	let rec aux acc i =
@@ -21,7 +21,6 @@ let parse_files n r =
 			aux (parsed_name :: acc) (i+1)
 	in
 	aux [] 1
-;;
 
 let concatenate_files f =
 	let rec aux acc fl c =
@@ -37,7 +36,6 @@ let concatenate_files f =
 			aux (data @ acc) tl (c+e)
 	in
 	aux [] f 0
-;;
 
 let sanitize_data l =
 	let rec aux acc c =
@@ -55,7 +53,6 @@ let sanitize_data l =
 				hd :: (aux tl c)
 	in
 	aux l 0
-;;
 
 let get_data_leak app rev =
 	let files = parse_files app rev in
@@ -66,5 +63,50 @@ let get_data_leak app rev =
 		(List.length data);
 	printf "sanitized data size for %s=%d\n"
 		app
-		(List.length sd)
-;;
+		(List.length sd);
+	sd
+
+let find_credentials_with_username login apps =
+	let res = ref "" in
+	let rec find_data acc =
+		match acc with
+		| [] -> ()
+		| (username,password)::tl ->
+			if username = login then begin
+				printf "username %s password %s\n" username password;
+				if password = !res then
+					printf "USERNAME %s SAME PASSWORD %s\n" username password;
+				res := password
+			end;
+			find_data tl
+	in
+	let rec aux acc =
+		match acc with
+		| [] -> ()
+		| (app,rev)::tl ->
+			printf "analyze leak %s with %d revision\n" app rev;
+			find_data (get_data_leak app rev);
+			aux tl
+	in
+	aux apps
+
+let get_credentials_with_password pw apps =
+	let rec find_data acc login =
+		match acc with
+		| [] -> ()
+		| (username,password)::tl ->
+			if password = pw then begin
+				printf "password match with username %s\n" username;
+				find_data tl (username :: login)
+			end;
+			find_data tl login
+	in
+	let rec aux acc =
+		match acc with
+		| [] -> ()
+		| (app,rev)::tl ->
+			printf "analyze leak %s with %d revision\n" app rev;
+			find_data (get_data_leak app rev) [];
+			aux tl
+	in
+	aux apps
