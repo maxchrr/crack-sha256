@@ -1,5 +1,8 @@
 (* Copyright (c) 2024 Max Charrier, Inès Schneider. All Rights Reserved. *)
 
+#require "cryptokit"
+#require "base64"
+
 let read_data_file f =
 	let ic = open_in f in
 	let rec aux acc c =
@@ -16,10 +19,5 @@ let read_data_file f =
 	in
 	aux [] 0
 
-(*#use "topfind";;
-#require "cryptokit";;
-#require "base64";;
-
-let hash_password pwd =
-	Base64.encode_exn(Cryptokit.hash_string (Cryptokit.Hash.sha256 ()) pwd)
-*)
+let hash_password pw =
+	Base64.encode_exn(Cryptokit.hash_string (Cryptokit.Hash.sha256 ()) pw)
