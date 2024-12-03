@@ -8,24 +8,6 @@ open List
 (* type for user' credentials *)
 type t = { app : string; id: string; pw: string }
 
-let parse_datafile (df : string) (rev : int) : string list =
-	let rec aux acc i =
-		if i > rev then acc
-		else
-			(* formal grammar for datafile path *)
-			let parsed_df =
-				"leaks/"
-				^ n
-				^ (if i <= 9 then "0" ^ string_of_int i else string_of_int i)
-				^ ".txt"
-			in
-			printf "Datafile %s revision %d parsed as %s\n" n i parsed_df;
-			(* construct the list with each file revision *)
-			aux (parsed_df::acc) (i+1)
-	in
-	(* start index at 1 because we don't have 'app00.txt' *)
-	aux [] 1
-
 let concatenate_files f =
 	let rec aux acc fl c =
 		if fl = [] then begin
