@@ -6,57 +6,9 @@ open Printf
 open List
 
 (* type for user' credentials *)
-type t = { app : string; id: string; pw: string }
+type t = { app : string; id : string; pw : string }
 
-let concatenate_files f =
-	let rec aux acc fl c =
-		if fl = [] then begin
-			printf "total leaked entries=%d\n" c;
-			acc
-		end else begin
-			(* read each file entry in the list *)
-			let data,e = read_datafile (hd fl) in
-			printf "reading file %s with %d entries\n" (hd fl) e;
-			(* append new readed data to the accumulated list *)
-			aux (data@acc) (tl fl) (c+e)
-		end
-	in
-	aux [] f 0
-
-let sanitize_data l =
-	let rec mem x acc =
-		if acc = [] then false
-		else hd acc = x || mem x (tl acc)
-	in
-	let rec aux acc c =
-		if acc = [] then begin
-			printf "total entries removed=%d\n" c;
-			acc
-		end else begin
-			(* return if head element is already present in the tail list *)
-			if mem (hd acc) (tl acc) then begin
-				(*printf "remove %s entry\n" (fst hd);*)
-				aux (tl acc) (c+1)
-			end else
-				(* go recursively to the end of the list *)
-				(hd acc)::(aux (tl acc) c)
-		end
-	in
-	aux l 0
-
-let get_data_leak df rev =
-	let files = parse_datafile df rev in
-	let data = concatenate_files files in
-	let sd = sanitize_data data in
-	(*printf "data size for %s=%d\n"
-		app
-		(List.length data);
-	printf "sanitized data size for %s=%d\n"
-		app
-		(List.length sd);*)
-	sd
-
-let find_credentials_with_username login apps =
+(*let find_credentials_with_username login apps =
 	let res = ref "" in
 	let rec find_data acc =
 		if acc = [] then ()
@@ -81,8 +33,9 @@ let find_credentials_with_username login apps =
 		end
 	in
 	aux apps
+*)
 
-let get_credentials_with_password pw apps =
+(*let get_credentials_with_password pw apps =
 	let rec find_data acc login =
 		if acc = [] then ()
 		else begin
@@ -105,6 +58,7 @@ let get_credentials_with_password pw apps =
 		end
 	in
 	aux apps
+*)
 
 let match_clean_password data =
 	let rec aux acc res =
@@ -122,36 +76,47 @@ let match_clean_password data =
 	in
 	aux data []
 
-let crack_with_wordlist (wl : string list) (df : string) : t list =
+let crack_with_wordlist
+	(wl : string list)
+	(data : (string * string) list)
+: (string * string) list =
 	let encrypted_wl = encrypt_wordlist wl in
-	let (data,nb_entries) = read_datafile df in
-	printf "Loaded %d password hash\n" nb_entries;
-	let rec match_user_credential lst acc pwe pwc =
+	let rec match_user_credential acc lst pwe pwc =
 		if lst = [] then acc
 		else begin
 			let (username,password) = hd lst in
 			(* password match *)
 			if password = pwe then begin
-				printf "app: %s\nid: %s\npw: %s\n\n"
-					df
+				(*printf "id: %s\npw: %s\n\n"
 					username
-					pwc;
+					pwc;*)
 				match_user_credential
+					(* add matched entry *)
+					((username,pwc)::acc)
 					(tl lst)
-					({ app = df; id = username; pw = pwc }::acc)
 					pwe
 					pwc
 			end else
-				match_user_credential (tl lst) acc pwe pwc
+				match_user_credential acc (tl lst) pwe pwc
 		end
 	in
-	let rec test_pw lst1 lst2 acc =
+	let rec test_pw acc lst1 lst2 =
 		if lst1 = [] then acc
 		else test_pw
+			(* pass on each data entry to test current password *)
+			(match_user_credential data acc (hd lst1) (hd lst2))
 			(* operation on wl and encrypted_wl at same time *)
 			(tl lst1)
 			(tl lst2)
-			(* pass on each data entry to test current password *)
-			(match_user_credential data acc (hd lst1) (hd lst2))
 	in
-	test_pw encrypted_wl wl []
+	test_pw [] encrypted_wl wl
+
+(*let formalize_result (app : string) (res : (string * string) list) : t list =
+	let rec aux lst acc =
+		if lst = [] then acc
+		else
+			let (id,pw) = hd acc in
+			aux (tl lst) ({ app = app ; id = id ; pw = pw }::acc)
+	in
+	aux res []
+*)

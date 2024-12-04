@@ -6,26 +6,9 @@
 open Printf
 open List
 
-let parse_datafile (df : string) (rev : int) : string list =
-	let rec aux acc i =
-		if i > rev then List.rev acc
-		else
-			(* formal grammar for datafile path *)
-			let parsed_df =
-				"leaks/"
-				^ df
-				^ (if i <= 9 then "0" ^ string_of_int i else string_of_int i)
-				^ ".txt"
-			in
-			printf "Datafile %s revision %d parsed as %s\n" df i parsed_df;
-			(* construct the list with each file revision *)
-			aux (parsed_df::acc) (i+1)
-	in
-	(* start index at 1 because we don't have 'app00.txt' *)
-	aux [] 1
-
 let read_datafile (df : string) : (string * string) list * int =
 	let ic = open_in df in
+	printf "Reading file %s...\n" df;
 	let rec aux acc c =
 		try
 			(* first line is for the username, second is for the password *)
@@ -39,6 +22,36 @@ let read_datafile (df : string) : (string * string) list * int =
 		(List.rev acc, c)
 	in
 	aux [] 0
+
+let rec mem (acc : 'a list) (x : 'a) : bool =
+	if acc = [] then false
+	else hd acc = x || mem (tl acc) x
+
+let concatenate_same_datafiles (df : string list) : (string * string) list =
+	let rec sanitize_data acc lst i =
+		if lst = [] then begin
+			printf "%d duplicated entries removed\n" i;
+			List.rev acc
+		end else if mem (tl lst) (hd lst) then
+			sanitize_data acc (tl lst) (i+1)
+		else
+			(* go recursively to the end of the list *)
+			sanitize_data ((hd lst)::acc) (tl lst) i
+	in
+	let rec aux acc lst i =
+		if lst = [] then
+			if i > 1 then begin
+				sanitize_data [] acc 0
+			end else List.rev acc
+		else begin
+			(* read each file entry in the list *)
+			let (data,nb_entries) = read_datafile (hd lst) in
+			printf "Loaded %d password hash\n" nb_entries;
+			(* append new readed data to the accumulated list *)
+			aux (data@acc) (tl lst) (i+1)
+		end
+	in
+	aux [] df 0
 
 let read_wordlist (wl : string) : string list =
 	let ic = open_in wl in
