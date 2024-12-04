@@ -122,61 +122,33 @@ let match_clean_password data =
 	in
 	aux data []
 
-(* for loop *)
-let rec match_password wl pw =
-	if wl = [] then ""
-	else if hash_password (hd wl) = pw then hd wl
-	else match_password (tl wl) pw
-
-(* while loop *)
-let rec find_login wl data c =
-	let cref = ref c in
-	if data = [] then printf "%d password cracked\n" c
-	else begin
-		let (username,password) = hd data in
-		let pw = match_password wl password in
-		if pw <> "" then begin
-			printf "username: %s\npassword: %s\n\n"
-				username
-				pw;
-			cref := !cref+1
-		end;
-		find_login wl (tl data) !cref
-	end
-
-let get_credentials pw apps =
-	let total = ref 0 in
-	let rec aux acc =
-		if acc = [] then begin
-			printf "%d total password cracked\n\n" !total;
-			()
-		end
+let crack_with_wordlist (wl : string list) (df : string) : t list =
+	let encrypted_wl = encrypt_wordlist wl in
+	let (data,nb_entries) = read_datafile df in
+	printf "Loaded %d password hash\n" nb_entries;
+	let rec match_user_credential lst acc pwe pwc =
+		if lst = [] then acc
 		else begin
-			let (app,rev) = hd acc in
-			printf "start cracking on %s\n" app;
-			(*find_login pw (get_data_leak app rev) 0;*)
-			let pwa = Array.of_list pw in
-			let len = Array.length pwa in
-			let data = get_data_leak app rev in
-			let c = ref 0 in
-			for i=0 to len-1 do
-				let hashed_pw = hash_password pwa.(i) in
-				let data = ref data in
-				while !data <> [] do
-					let (username,password) = hd !data in
-					if password = hashed_pw then begin
-						printf "app_name: %s\nusername: %s\npassword: %s\n\n"
-							(app ^ " " ^ (string_of_int rev))
-							username
-							pwa.(i);
-						c := !c+1
-					end;
-					data := tl !data
-				done
-			done;
-			printf "%d password cracked on %s\n\n" !c app;
-			total := !total + !c;
-			aux (tl acc)
+			let (username,password) = hd lst in
+			if password = pwe then begin
+				printf "app: %s\nid: %s\npw: %s\n\n"
+					df
+					username
+					pwc;
+				match_user_credential
+					(tl lst)
+					({ app = df; id = username; pw = pwc }::acc)
+					pwe
+					pwc
+			end else
+				match_user_credential (tl lst) acc pwe pwc
 		end
 	in
-	aux apps
+	let rec test_pw lst1 lst2 acc =
+		if lst1 = [] then acc
+		else test_pw
+			(tl lst1)
+			(tl lst2)
+			(match_user_credential data acc (hd lst1) (hd lst2))
+	in
+	test_pw encrypted_wl wl []
