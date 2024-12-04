@@ -130,6 +130,7 @@ let crack_with_wordlist (wl : string list) (df : string) : t list =
 		if lst = [] then acc
 		else begin
 			let (username,password) = hd lst in
+			(* password match *)
 			if password = pwe then begin
 				printf "app: %s\nid: %s\npw: %s\n\n"
 					df
@@ -147,8 +148,10 @@ let crack_with_wordlist (wl : string list) (df : string) : t list =
 	let rec test_pw lst1 lst2 acc =
 		if lst1 = [] then acc
 		else test_pw
+			(* operation on wl and encrypted_wl at same time *)
 			(tl lst1)
 			(tl lst2)
+			(* pass on each data entry to test current password *)
 			(match_user_credential data acc (hd lst1) (hd lst2))
 	in
 	test_pw encrypted_wl wl []
