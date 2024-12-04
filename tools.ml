@@ -8,7 +8,7 @@ open List
 
 let parse_datafile (df : string) (rev : int) : string list =
 	let rec aux acc i =
-		if i > rev then acc
+		if i > rev then List.rev acc
 		else
 			(* formal grammar for datafile path *)
 			let parsed_df =
