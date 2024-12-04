@@ -13,11 +13,11 @@ let parse_datafile (df : string) (rev : int) : string list =
 			(* formal grammar for datafile path *)
 			let parsed_df =
 				"leaks/"
-				^ n
+				^ df
 				^ (if i <= 9 then "0" ^ string_of_int i else string_of_int i)
 				^ ".txt"
 			in
-			printf "Datafile %s revision %d parsed as %s\n" n i parsed_df;
+			printf "Datafile %s revision %d parsed as %s\n" df i parsed_df;
 			(* construct the list with each file revision *)
 			aux (parsed_df::acc) (i+1)
 	in
@@ -49,17 +49,17 @@ let read_wordlist (wl : string) : string list =
 			(* construct the list with readed word *)
 			aux (word::acc)
 		with End_of_file -> close_in ic;
-		acc
+		List.rev acc
 	in
 	aux []
 
 let hash_password (pw : string) : string =
-	(* encrypt password with sha2-256 and base64 encoding (rfc 4648 *)
+	(* encrypt password with sha256 and base64 encoding (rfc4648) *)
 	Base64.encode_exn (Cryptokit.hash_string (Cryptokit.Hash.sha256 ()) pw)
 
 let encrypt_wordlist (wl : string list) : string list =
 	let rec aux acc lst =
-		if lst = [] then acc
+		if lst = [] then List.rev acc
 		(* construct the list with password hashes *)
 		else aux (hash_password (hd lst)::acc) (tl lst)
 	in
