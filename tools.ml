@@ -11,38 +11,53 @@ let read_datafile (df : string) : (string * string) list * int =
 	printf "Reading file %s...\n" df;
 	let rec aux acc c =
 		try
-			(* first line is for the username, second is for the password *)
-			(* and it repeats *)
-			let username = input_line ic in
-			let password = input_line ic in
-			(* construct the list with credential *)
-			aux ((username, password)::acc) (c+1)
+			(* first line is for the id, second is for the encrypted password
+				and it repeats
+			*)
+			let id = input_line ic in
+			let pw = input_line ic in
+			(* construct the list with user credentials *)
+			aux ((id, pw)::acc) (c+1)
 		with End_of_file -> close_in ic;
 		(* preserve file order *)
 		(List.rev acc, c)
 	in
 	aux [] 0
 
-let rec mem (acc : 'a list) (x : 'a) : bool =
-	if acc = [] then false
-	else hd acc = x || mem (tl acc) x
-
-let concatenate_same_datafiles (df : string list) : (string * string) list =
-	let rec sanitize_data acc lst i =
-		if lst = [] then begin
-			printf "%d duplicated entries removed\n" i;
-			List.rev acc
-		end else if mem (tl lst) (hd lst) then
-			sanitize_data acc (tl lst) (i+1)
-		else
-			(* go recursively to the end of the list *)
-			sanitize_data ((hd lst)::acc) (tl lst) i
+let rec sanitize_data
+	(data : (string * string) list)
+	(res : (string * string) list)
+	(i : int)
+: (string * string) list =
+	let rec mem set x =
+		if set = [] then false
+		(* return true if x is equal to the first element of set,
+			else go to next first element by reducing set
+		*)
+		else hd set = x || mem (tl set) x
 	in
 	let rec aux acc lst i =
+		if lst = [] then begin
+			printf "%d duplicated entries removed\n" i;
+			(* preserve data order *)
+			List.rev acc
+		end else if mem (tl lst) (hd lst) then
+			(* forget this entry and go to the next data entry *)
+			sanitize_data acc (tl lst) (i+1)
+		else
+			(* reconstruct the list with scanned entry and
+				go to the next data entry
+			*)
+			sanitize_data ((hd lst)::acc) (tl lst) i
+	in
+	aux res data i
+
+let concatenate_same_datafiles (df : string list) : (string * string) list =
+	let rec aux acc lst i =
 		if lst = [] then
-			if i > 1 then begin
-				sanitize_data [] acc 0
-			end else List.rev acc
+			if i > 1 then sanitize_data [] acc 0
+			(* preserve data order *)
+			else List.rev acc
 		else begin
 			(* read each file entry in the list *)
 			let (data,nb_entries) = read_datafile (hd lst) in

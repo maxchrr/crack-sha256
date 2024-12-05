@@ -52,7 +52,9 @@ let match_by_password
 		if lst = [] then acc
 		else begin
 			let (id,pw) = hd lst in
-			(* if password match, add entry to accumlated list *)
+			(* if encrypted password is the same as in user credential,
+				add them with clear password to acc list
+			*)
 			if pw = pwe then aux ((id,pwc)::acc) (tl lst)
 			(* else go to next entry *)
 			else aux acc (tl lst)
@@ -70,7 +72,7 @@ let crack_with_wordlist
 		else aux
 			(* pass on each data entry to test current password *)
 			(match_by_password data acc (hd lst1) (hd lst2))
-			(* operation on wl and encrypted_wl at same time *)
+			(* operations on wl and encrypted_wl at same time *)
 			(tl lst1)
 			(tl lst2)
 	in
