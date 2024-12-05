@@ -1,19 +1,11 @@
-                               _______
-                             |.-----.|
-                             ||x . x||
-                             ||_.-._||
-                             `--)-(--`
-                            __[=== o]___
-                           |:::::::::::|\
-                           `-=========-`()
+Crack SHA-256 is a university project trying to crack as much user credential
+as possible from leaked data sources (fake data).
 
-Hack SHA-256 is a university project involving an attempt to extract
-credentials (username and password) from leaked data sources (fake data).
+We operate two kind of attack:
+1. Classic dictionnary attack using wordlist on each data entry.
 
-Some passwords are in clear text and others in hash form, but based on the
-theory that users use the same passwords on different services, we can try
-to recover some of them.
-
+2. Using the theory that user use same credential on different services, try
+to get a password match.
 
    Legal
 
