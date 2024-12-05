@@ -35,12 +35,19 @@ type t = { app : string; id : string; pw : string }
 	aux apps
 *)
 
-let match_user_credential
+let match_by_id
+	(data : (string * string) list)
+	(res : (string * string) list)
+	(id : string)
+: unit =
+	()
+
+let match_by_password
 	(data : (string * string) list)
 	(res : (string * string) list)
 	(pwc : string)
 	(pwe : string)
-=
+: (string * string list) =
 	let rec aux acc lst =
 		if lst = [] then acc
 		else begin
@@ -62,14 +69,17 @@ let crack_with_wordlist
 		if lst1 = [] && lst2 = [] then acc
 		else aux
 			(* pass on each data entry to test current password *)
-			(match_user_credential data acc (hd lst1) (hd lst2))
+			(match_by_password data acc (hd lst1) (hd lst2))
 			(* operation on wl and encrypted_wl at same time *)
 			(tl lst1)
 			(tl lst2)
 	in
 	aux [] wl encrypted_wl
 
-(*let formalize_result (app : string) (res : (string * string) list) : t list =
+(*let formalize_result
+	(app : string)
+	(res : (string * string) list)
+: t list =
 	let rec aux lst acc =
 		if lst = [] then acc
 		else
