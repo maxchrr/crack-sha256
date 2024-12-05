@@ -47,12 +47,12 @@ let match_by_password
 	(res : (string * string) list)
 	(pwc : string)
 	(pwe : string)
-: (string * string list) =
+: (string * string) list =
 	let rec aux acc lst =
 		if lst = [] then acc
 		else begin
 			let (id,pw) = hd lst in
-			(* if password match add entry to accumlated list *)
+			(* if password match, add entry to accumlated list *)
 			if pw = pwe then aux ((id,pwc)::acc) (tl lst)
 			(* else go to next entry *)
 			else aux acc (tl lst)
