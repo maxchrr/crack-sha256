@@ -35,31 +35,6 @@ type t = { app : string; id : string; pw : string }
 	aux apps
 *)
 
-(*let get_credentials_with_password pw apps =
-	let rec find_data acc login =
-		if acc = [] then ()
-		else begin
-			let (username,password) = hd acc in
-			if password = pw then begin
-				let (username,password) = hd acc in
-				printf "password match with username %s\n" username;
-				find_data (tl acc) (username::login)
-			end;
-			find_data (tl acc) login
-		end
-	in
-	let rec aux acc =
-		if acc = [] then ()
-		else begin
-			let (app,rev) = hd acc in
-			printf "analyze leak %s with %d revision\n" app rev;
-			find_data (get_data_leak app rev) [];
-			aux (tl acc)
-		end
-	in
-	aux apps
-*)
-
 let match_user_credential
 	(data : (string * string) list)
 	(res : (string * string) list)
