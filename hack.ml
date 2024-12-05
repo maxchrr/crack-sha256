@@ -60,56 +60,39 @@ type t = { app : string; id : string; pw : string }
 	aux apps
 *)
 
-let match_clean_password data =
-	let rec aux acc res =
-		if acc = [] then
-			res
+let match_user_credential
+	(data : (string * string) list)
+	(res : (string * string) list)
+	(pwc : string)
+	(pwe : string)
+=
+	let rec aux acc lst =
+		if lst = [] then acc
 		else begin
-			let (username,password) = hd acc in
-			let hash_pw = hash_password password in
-			printf "username: %s\npassword: %s\nhash password: %s\n\n"
-				username
-				password
-				hash_pw;
-			aux (tl acc) (hash_pw::res)
+			let (id,pw) = hd lst in
+			(* if password match add entry to accumlated list *)
+			if pw = pwe then aux ((id,pwc)::acc) (tl lst)
+			(* else go to next entry *)
+			else aux acc (tl lst)
 		end
 	in
-	aux data []
+	aux res data
 
 let crack_with_wordlist
 	(wl : string list)
 	(data : (string * string) list)
 : (string * string) list =
 	let encrypted_wl = encrypt_wordlist wl in
-	let rec match_user_credential acc lst pwe pwc =
-		if lst = [] then acc
-		else begin
-			let (username,password) = hd lst in
-			(* password match *)
-			if password = pwe then begin
-				(*printf "id: %s\npw: %s\n\n"
-					username
-					pwc;*)
-				match_user_credential
-					(* add matched entry *)
-					((username,pwc)::acc)
-					(tl lst)
-					pwe
-					pwc
-			end else
-				match_user_credential acc (tl lst) pwe pwc
-		end
-	in
-	let rec test_pw acc lst1 lst2 =
-		if lst1 = [] then acc
-		else test_pw
+	let rec aux acc lst1 lst2 =
+		if lst1 = [] && lst2 = [] then acc
+		else aux
 			(* pass on each data entry to test current password *)
 			(match_user_credential data acc (hd lst1) (hd lst2))
 			(* operation on wl and encrypted_wl at same time *)
 			(tl lst1)
 			(tl lst2)
 	in
-	test_pw [] encrypted_wl wl
+	aux [] wl encrypted_wl
 
 (*let formalize_result (app : string) (res : (string * string) list) : t list =
 	let rec aux lst acc =
