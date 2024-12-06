@@ -1,5 +1,4 @@
 (* Copyright (c) 2024 Max Charrier, Inès Schneider. All Rights Reserved. *)
-
 #require "cryptokit"
 #require "base64"
 
