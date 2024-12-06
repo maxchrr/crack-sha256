@@ -15,7 +15,7 @@ let find_by_login
 	: (string * string) list =
 	let rec aux acc lst =
 		if lst = [] then begin
-			(*printf "%d CREDENTIALS FOUND\n" (length acc);*)
+			printf "%d CREDENTIALS FOUND\n" (length acc);
 			acc
 		end else begin
 			let (id,pw) = hd lst in
@@ -23,11 +23,11 @@ let find_by_login
 				add them to acc list
 			*)
 			if id = clear_id && pw = hash_password clear_pw then begin
-				(*printf "------------------------------\n";
+				printf "------------------------------\n";
 				printf "USER CREDENTIALS FOUND!\n";
 				printf "id: %s\nhash pw: %s\n" id pw;
 				printf "clear pw: %s\n" clear_pw;
-				printf "------------------------------\n";*)
+				printf "------------------------------\n";
 				aux ((id,clear_pw)::acc) (tl lst)
 			(* else go to next entry *)
 			end else aux acc (tl lst)
@@ -43,7 +43,7 @@ let crack_with_clear_data
 		if lst = [] then acc
 		else begin
 			let (id,pw) = hd lst in
-			(*printf "id: %s\npw: %s\n" id pw;*)
+			printf "id: %s\npw: %s\n" id pw;
 			aux
 				(* pass over each data entry to check whether it satisfies
 					the predicates
@@ -63,15 +63,15 @@ let find_by_password
 	: (string * string) list =
 	let rec aux acc lst =
 		if lst = [] then begin
-			(*printf "%d CREDENTIAL FOUND\n" (length acc);*)
+			printf "%d CREDENTIAL FOUND\n" (length acc);
 			acc
 		end else begin
 			let (id,pw) = hd lst in
-			(*printf "------------------------------\n";
+			printf "------------------------------\n";
 			printf "USER CREDENTIALS FOUND!\n";
 			printf "id: %s\nhash pw: %s\n" id pw;
 			printf "clear pw: %s\n" clear_pw;
-			printf "------------------------------\n";*)
+			printf "------------------------------\n";
 			(* if encrypted password is the same as in user credentials,
 				add them with clear password to acc list
 			*)
@@ -92,7 +92,7 @@ let crack_with_wordlist
 		else begin
 			let word = hd lst1 in
 			let encrypted_word = hd lst2 in
-			(*printf "word: %s\nencrypted word: %s\n" word encrypted_word;*)
+			printf "word: %s\nencrypted word: %s\n" word encrypted_word;
 			aux
 				(* pass over each data entry to check whether it satisfies
 					the predicates
