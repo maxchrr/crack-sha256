@@ -8,40 +8,6 @@ open List
 (* type for user' credentials *)
 type t = { app : string; id : string; pw : string }
 
-(*let find_credentials_with_username login apps =
-	let res = ref "" in
-	let rec find_data acc =
-		if acc = [] then ()
-		else begin
-			let (username,password) = hd acc in
-			if username = login then begin
-				printf "username %s password %s\n" username password;
-				if password = !res then
-					printf "USERNAME %s SAME PASSWORD %s\n" username password;
-				res := password
-			end;
-			find_data (tl acc)
-		end
-	in
-	let rec aux acc =
-		if acc = [] then ()
-		else begin
-			let (app,rev) = hd acc in
-			printf "analyze leak %s with %d revision\n" app rev;
-			find_data (get_data_leak app rev);
-			aux (tl acc)
-		end
-	in
-	aux apps
-*)
-
-let match_by_id
-	(data : (string * string) list)
-	(res : (string * string) list)
-	(id : string)
-: unit =
-	()
-
 let match_by_password
 	(data : (string * string) list)
 	(res : (string * string) list)
@@ -49,8 +15,10 @@ let match_by_password
 	(pwe : string)
 : (string * string) list =
 	let rec aux acc lst =
-		if lst = [] then acc
-		else begin
+		if lst = [] then begin
+			printf "\n%d CREDENTIAL MATCH\n" (length acc);
+			acc
+		end else begin
 			let (id,pw) = hd lst in
 			(* if encrypted password is the same as in user credential,
 				add them with clear password to acc list
@@ -77,6 +45,35 @@ let crack_with_wordlist
 			(tl lst2)
 	in
 	aux [] wl encrypted_wl
+
+let crack_with_clear_data
+	(clear_data : (string * string) list)
+	(data : (string * string) list)
+: (string * string) list =
+	let rec find_in_data acc lst cred =
+		if lst = [] then acc
+		else
+			let (id,pw) = hd lst in
+			if id = fst cred && hash_password pw = snd cred then begin
+				printf "------------------------------\n";
+				printf "CREDENTIAL MATCH\n";
+				printf "id: %s\nclear pw: %s\n" id pw;
+				printf "hash pw: %s\n" (snd cred);
+				printf "------------------------------\n";
+				find_in_data ((id,pw)::acc) (tl lst) cred
+			end else find_in_data acc (tl lst) cred
+	in
+	let rec aux acc lst =
+		if lst = [] then begin
+			printf "\n%d CREDENTIAL MATCH\n" (length acc);
+			acc
+		end else begin
+			let (id,pw) = hd lst in
+			printf "id: %s\npw: %s\n" id pw;
+			aux (find_in_data acc data (id,pw)) (tl lst)
+		end
+	in
+	aux [] clear_data
 
 (*let formalize_result
 	(app : string)
