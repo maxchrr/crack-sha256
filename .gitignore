@@ -7,3 +7,6 @@
 
 ### Exploit files ###
 exploit_*.ml
+
+### Logs ###
+logs/
