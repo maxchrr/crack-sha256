@@ -28,7 +28,7 @@ let rec sanitize_data
 	(data : (string * string) list)
 	(res : (string * string) list)
 	(i : int)
-: (string * string) list =
+	: (string * string) list =
 	let rec mem set x =
 		if set = [] then false
 		(* return true if x is equal to the first element of set,

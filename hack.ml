@@ -13,10 +13,12 @@ let find_by_login
 	(res : (string * string) list)
 	(clear_id : string)
 	(clear_pw : string)
-: (string * string) list =
+	: (string * string) list =
 	let rec aux acc lst =
-		if lst = [] then acc
-		else begin
+		if lst = [] then begin
+			printf "\n%d CREDENTIAL MATCH\n" (length acc);
+			acc
+		end else begin
 			let (id,pw) = hd lst in
 			if id = clear_id && pw = hash_password clear_pw then begin
 				printf "------------------------------\n";
@@ -33,13 +35,13 @@ let find_by_login
 let crack_with_clear_data
 	(clear_data : (string * string) list)
 	(data : (string * string) list)
-: (string * string) list =
+	: (string * string) list =
 	let rec aux acc lst =
 		if lst = [] then acc
 		else begin
 			let (id,pw) = hd lst in
 			printf "id: %s\npw: %s\n" id pw;
-			aux (find_by_login acc data id pw) (tl lst)
+			aux (find_by_login data acc id pw) (tl lst)
 		end
 	in
 	aux [] clear_data
@@ -49,13 +51,14 @@ let find_by_password
 	(res : (string * string) list)
 	(pwc : string)
 	(pwe : string)
-: (string * string) list =
+	: (string * string) list =
 	let rec aux acc lst =
 		if lst = [] then begin
 			printf "\n%d CREDENTIAL MATCH\n" (length acc);
 			acc
 		end else begin
 			let (id,pw) = hd lst in
+			printf "id: %s\npw: %s\n" id pw;
 			(* if encrypted password is the same as in user credential,
 				add them with clear password to acc list
 			*)
@@ -69,7 +72,7 @@ let find_by_password
 let crack_with_wordlist
 	(wl : string list)
 	(data : (string * string) list)
-: (string * string) list =
+	: (string * string) list =
 	let encrypted_wl = encrypt_wordlist wl in
 	let rec aux acc lst1 lst2 =
 		if lst1 = [] && lst2 = [] then acc
