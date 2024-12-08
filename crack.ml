@@ -108,7 +108,7 @@ let crack_with_wordlist
 
 let formalize_result
 	(app : string)
-	(data : (string * string) list * (string * string) list)
+	(data : (string * string) list)
 	: t list =
 	let rec aux acc lst =
 		if lst = [] then acc
@@ -118,4 +118,4 @@ let formalize_result
 			aux ({ app=app; id=id; pw=pw }::acc) (tl lst)
 	in
 	(* Start the recursion with the matched credentials *)
-	aux [] (fst data)
+	aux [] data
