@@ -1,9 +1,29 @@
 (* Copyright (c) 2024 Max Charrier, Inès Schneider. All Rights Reserved. *)
-#require "cryptokit"
-#require "base64"
+(*#require "cryptokit"
+#require "base64"*)
 
 open Printf
 open List
+
+let parse_input_files (files : string list) : (string * int) list =
+	let rec aux acc lst =
+		if lst = [] then acc
+		else begin
+			let file_path = List.hd lst in
+			(* Regex that match two capture groups *)
+			let re = Re2.create_exn "([a-zA-Z_]+)([0-9]+)" in
+			(* Get submatches *)
+			let app = Option.get (Re2.find_submatches_exn re file_path).(1) in
+			let rev =
+				int_of_string (
+					Option.get (Re2.find_submatches_exn re file_path).(2)
+				)
+			in
+			(* Continue recursively for each file *)
+			aux ((app,rev)::acc) (List.tl lst)
+		end
+	in
+	aux [] files
 
 let parse_datafile (df : string) (rev : int) : string list =
 	let rec aux acc i =
