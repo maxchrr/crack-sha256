@@ -1,8 +1,9 @@
 (* Copyright (c) 2024 Max Charrier, Inès Schneider. All Rights Reserved. *)
-#use "tools.ml"
+(*#use "tools.ml"*)
 
 open Printf
 open List
+open Tools
 
 (* Type for storing user credentials *)
 type t = { app : string; id : string; pw : string }
@@ -19,10 +20,10 @@ let partition_by_login
 			(rev yes, rev no)
 		else
 			let (id,pw) = hd lst in
-			printf "id: %s, hash pw: %s\n" id pw;
+			(*printf "id: %s, hash pw: %s\n" id pw;*)
 			(* Predicate over id and password *)
 			if id = clear_id && pw = hash_password clear_pw then begin
-				printf "FIND clear pw %s\n" clear_pw;
+				(*printf "FIND clear pw %s\n" clear_pw;*)
 				(* Add to the first list 'yes' that satisfy the predicate
 					and continue with the rest of data
 				*)
@@ -66,10 +67,10 @@ let partition_by_password
 		if lst = [] then (rev yes, rev no)
 		else
 			let (id,pw) = hd lst in
-			printf "id: %s, hash pw: %s\n" id pw;
+			(*printf "id: %s, hash pw: %s\n" id pw;*)
 			(* Predicate over password *)
 			if pw = encrypted_pw then begin
-				printf "FIND clear pw %s\n" clear_pw;
+				(*printf "FIND clear pw %s\n" clear_pw;*)
 				(* Add to the first list 'yes' that satisfy the predicate
 					and continue with the rest of data
 				*)
@@ -93,7 +94,7 @@ let crack_with_wordlist
 		else begin
 			let word = hd lst1 in
 			let encrypted_word = hd lst2 in
-			printf "\nword: %s, encrypted word: %s\n" word encrypted_word;
+			(*printf "\nword: %s, encrypted word: %s\n" word encrypted_word;*)
 			let (yes,no) =
 				(* Partition the data by comparing the encrypted word. *)
 				partition_by_password (fst acc,[]) rest word encrypted_word
