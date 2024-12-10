@@ -25,24 +25,6 @@ let parse_input_files (files : string list) : (string * int) list =
 	in
 	aux [] files
 
-let parse_datafile (df : string) (rev : int) : string list =
-	let rec aux acc i =
-		if i > rev then List.rev acc
-		else
-			(* Formal grammar for datafile path *)
-			let parsed_df =
-				"data/"
-				^ df
-				^ (if i <= 9 then "0" ^ string_of_int i else string_of_int i)
-				^ ".txt"
-			in
-			printf "Datafile %s revision %d parsed as %s\n" df i parsed_df;
-			(* Continue recursively for each file revision *)
-			aux (parsed_df::acc) (i+1)
-	in
-	(* Start the recursion index at 1 because we don't have 'app00.txt' *)
-	aux [] 1
-
 let read_datafile (df : string) : (string * string) list * int =
 	let ic = open_in df in
 	printf "Reading file %s...\n" df;
