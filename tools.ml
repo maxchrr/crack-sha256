@@ -10,7 +10,7 @@ let parse_input_files (files : string list) : (string * int) list =
 	let rec aux acc lst =
 		if lst = [] then rev acc
 		else begin
-			let file_path = List.hd lst in
+			let file_path = hd lst in
 			(* Regex that match two capture groups *)
 			let re = Re2.create_exn "([a-zA-Z_]+)([0-9]+)" in
 			(* Get submatches *)
@@ -23,7 +23,7 @@ let parse_input_files (files : string list) : (string * int) list =
 				)
 			in
 			(* Continue recursively for each file *)
-			aux ((app_name,revision)::acc) (List.tl lst)
+			aux ((app_name,revision)::acc) (tl lst)
 		end
 	in
 	aux [] files
@@ -36,33 +36,23 @@ let split_same_files
 		if lst1 = [] && lst2 = [] then
 			(* If current scanned group is empty, add to accumulator *)
 			if current_group = [] then acc
-			else (List.rev current_group) :: acc
+			else (rev current_group)::acc
 		else
-			let file = List.hd lst1 in
-			let (app,_) = List.hd lst2 in
+			let file = hd lst1 in
+			let (app,_) = hd lst2 in
 			if app = current_app then
 				(* App name matches, add file to current group *)
-				aux
-					acc
-					(List.tl lst1)
-					(List.tl lst2)
-					current_app
-					(file::current_group)
+				aux acc (tl lst1) (tl lst2) current_app (file::current_group)
 			else
 				(* Finalize current group *)
 				let new_acc =
 					if current_group = [] then acc
-					else (List.rev current_group)::acc
+					else (rev current_group)::acc
 				in
 				(* Start a new group *)
-				aux
-					new_acc
-					(List.tl lst1)
-					(List.tl lst2)
-					app
-					[file]
+				aux new_acc (tl lst1) (tl lst2) app [file]
 	in
-	List.rev (aux [] files parsed_files "" [])
+	rev (aux [] files parsed_files "" [])
 
 let read_datafile (df : string) : (string * string) list * int =
 	let ic = open_in df in
