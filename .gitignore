@@ -8,5 +8,16 @@
 ### Exploit files ###
 exploit_*.ml
 
+### OCaml ###
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+
 ### Logs ###
 logs/
