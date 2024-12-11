@@ -28,6 +28,42 @@ let parse_input_files (files : string list) : (string * int) list =
 	in
 	aux [] files
 
+let split_same_files
+	(files : string list)
+	(parsed_files : (string * int) list)
+	: string list list =
+	let rec aux acc lst1 lst2 current_app current_group =
+		if lst1 = [] && lst2 = [] then
+			(* If current scanned group is empty, add to accumulator *)
+			if current_group = [] then acc
+			else (List.rev current_group) :: acc
+		else
+			let file = List.hd lst1 in
+			let (app,_) = List.hd lst2 in
+			if app = current_app then
+				(* App name matches, add file to current group *)
+				aux
+					acc
+					(List.tl lst1)
+					(List.tl lst2)
+					current_app
+					(file::current_group)
+			else
+				(* Finalize current group *)
+				let new_acc =
+					if current_group = [] then acc
+					else (List.rev current_group)::acc
+				in
+				(* Start a new group *)
+				aux
+					new_acc
+					(List.tl lst1)
+					(List.tl lst2)
+					app
+					[file]
+	in
+	List.rev (aux [] files parsed_files "" [])
+
 let read_datafile (df : string) : (string * string) list * int =
 	let ic = open_in df in
 	printf "Reading file %s...\n" df;
