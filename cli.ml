@@ -38,13 +38,21 @@ let crack_data
 	(files : string list list)
 	: Crack.t list =
 	let rec aux acc lst1 =
-		if lst1 = [] then acc
+		if lst1 = [] then List.rev acc
 		else begin
 			let files = List.hd lst1 in
 			let parsed_data = fst (List.hd (parse_files files)) in
+			(* Load and process current dataset *)
 			let data = concatenate_same_datafiles files in
+			(* Attempt to crack the encrypted dataset using
+				the clear data
+			*)
 			let res1 = crack_with_clear_data clear_data data in
+			(* Attempt to crack the encrypted dataset using
+				the wordlist
+			*)
 			let res2 = crack_with_wordlist wl (snd res1) in
+			(* Formalize results *)
 			let data_decrypted =
 				formalize_result parsed_data ((fst res1)@(fst res2))
 			in
@@ -63,13 +71,18 @@ let () =
 		Printf.printf "Please provide wordlist with -w option\n";
 		exit 1
 	end;
+
 	(* Preserve written order *)
 	clear_files := List.rev !clear_files;
 	input_files := List.rev !input_files;
 	let parsed_files = parse_files !input_files in
 	let splited_files = split_same_files !input_files parsed_files in
+
+	(* Load and process files to use as clear data *)
 	let clear_data = concatenate_same_datafiles !clear_files in
+	(* Load the wordlist for cracking passwords *)
 	let wl = read_wordlist !wordlist in
+
 	let res = crack_data clear_data wl splited_files in
 	Printf.printf
 		"%d password decrypted, see output for more details\n"
