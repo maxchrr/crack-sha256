@@ -19,5 +19,8 @@ exploit_*.ml
 *.cmxs
 *.cmxa
 
+### Binaries ###
+bin/
+
 ### Logs ###
 logs/
