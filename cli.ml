@@ -83,4 +83,5 @@ let () =
 	(* Load and process files to use as clear data *)
 	let clear_data = concatenate_same_datafiles !clear_files in
 
-	crack_data wl clear_data splited_files
+	crack_data wl clear_data splited_files;
+	()
