@@ -83,7 +83,4 @@ let () =
 	(* Load and process files to use as clear data *)
 	let clear_data = concatenate_same_datafiles !clear_files in
 
-	let res = crack_data wl clear_data splited_files in
-	Printf.printf
-		"%d password decrypted, see output for more details\n"
-		(List.length res)
+	crack_data wl clear_data splited_files

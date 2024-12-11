@@ -111,12 +111,14 @@ let formalize_result
 	(app : string)
 	(data : (string * string) list)
 	: t list =
-	let rec aux acc lst =
-		if lst = [] then acc
-		else
+	let rec aux acc lst i =
+		if lst = [] then begin
+			printf "%d password decrypted, see output for more details\n" i;
+			acc
+		end else
 			let (id,pw) = hd lst in
 			(* Add a formatted credential entry to the result *)
-			aux ({ app=app; id=id; pw=pw }::acc) (tl lst)
+			aux ({ app=app; id=id; pw=pw }::acc) (tl lst) (i+1)
 	in
 	(* Start the recursion with the matched credentials *)
-	aux [] data
+	aux [] data 0
