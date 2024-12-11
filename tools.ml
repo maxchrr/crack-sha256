@@ -6,7 +6,7 @@
 open Printf
 open List
 
-let parse_input_files (files : string list) : (string * int) list =
+let parse_files (files : string list) : (string * int) list =
 	let rec aux acc lst =
 		if lst = [] then rev acc
 		else begin
