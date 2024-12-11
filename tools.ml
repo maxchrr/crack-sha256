@@ -1,5 +1,6 @@
 (* Copyright (c) 2024 Max Charrier, Inès Schneider. All Rights Reserved. *)
-(*#require "cryptokit"
+(*#require "re2"
+#require "cryptokit"
 #require "base64"*)
 
 open Printf
@@ -7,20 +8,22 @@ open List
 
 let parse_input_files (files : string list) : (string * int) list =
 	let rec aux acc lst =
-		if lst = [] then acc
+		if lst = [] then rev acc
 		else begin
 			let file_path = List.hd lst in
 			(* Regex that match two capture groups *)
 			let re = Re2.create_exn "([a-zA-Z_]+)([0-9]+)" in
 			(* Get submatches *)
-			let app = Option.get (Re2.find_submatches_exn re file_path).(1) in
-			let rev =
+			let app_name =
+				Option.get (Re2.find_submatches_exn re file_path).(1)
+			in
+			let revision =
 				int_of_string (
 					Option.get (Re2.find_submatches_exn re file_path).(2)
 				)
 			in
 			(* Continue recursively for each file *)
-			aux ((app,rev)::acc) (List.tl lst)
+			aux ((app_name,revision)::acc) (List.tl lst)
 		end
 	in
 	aux [] files
@@ -37,7 +40,7 @@ let read_datafile (df : string) : (string * string) list * int =
 			aux ((id, pw)::acc) (i+1)
 		with End_of_file -> close_in ic;
 		(* Preserve file order *)
-		(List.rev acc, i)
+		(rev acc, i)
 	in
 	aux [] 0
 
@@ -55,7 +58,7 @@ let sanitize_data
 		if lst = [] then begin
 			printf "%d duplicated entries removed\n" i;
 			(* preserve data order *)
-			List.rev acc
+			rev acc
 		end else if mem (tl lst) (hd lst) then
 			(* If the current entry is a duplicate, skip it *)
 			aux acc (tl lst) (i+1)
@@ -73,7 +76,7 @@ let concatenate_same_datafiles (df : string list) : (string * string) list =
 			*)
 			if i > 1 then sanitize_data acc []
 			(* If only one file, no need to sanitize. *)
-			else List.rev acc
+			else rev acc
 		else begin
 			(* Read the next data file *)
 			let (data,nb_entries) = read_datafile (hd lst) in
@@ -95,7 +98,7 @@ let read_wordlist (wl : string) : string list =
 			(* Construct the list with word *)
 			aux (word::acc)
 		with End_of_file -> close_in ic;
-		List.rev acc
+		rev acc
 	in
 	aux []
 
@@ -105,7 +108,7 @@ let hash_password (pw : string) : string =
 
 let encrypt_wordlist (wl : string list) : string list =
 	let rec aux acc lst =
-		if lst = [] then List.rev acc
+		if lst = [] then rev acc
 		else
 			(* Hash the current word and add it to the accumulator *)
 			aux (hash_password (hd lst)::acc) (tl lst)
